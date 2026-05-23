@@ -4,7 +4,7 @@ import re
 
 #=====Data_Appender=====
 
-def add_data(data, files=r"C:\Users\rosha\OneDrive\Desktop\Programs_\EMail_Spam_Classifier\Data.csv",done=False):
+def add_data(data, files="Data.csv",done=False):
     data = data.lower()
     dataset = re.findall(r'[a-zA-Z]+', data)
     df = pd.read_csv(files)
@@ -15,7 +15,7 @@ def add_data(data, files=r"C:\Users\rosha\OneDrive\Desktop\Programs_\EMail_Spam_
                 num += 1
                 f.write(f"{num},{i}\n")
     return dataset
-def vectorize(data, files=r"C:\Users\rosha\OneDrive\Desktop\Programs_\EMail_Spam_Classifier\Data.csv"):
+def vectorize(data, files="Data.csv"):
     vector = []
     data = data.lower()
     dataset = re.findall(r'[a-zA-Z]+', data)
@@ -40,7 +40,7 @@ def perceptron(D,T,th=None,th0=0):
 
 #=====Saving_Hypothesis=====
 
-def save_thetas(th,th0,file=r"C:\Users\rosha\OneDrive\Desktop\Programs_\EMail_Spam_Classifier\thetas.csv"):
+def save_thetas(th,th0,file="thetas.csv"):
     with open(file, "a") as f:
         f.write(f'"{th}",{th0}\n')
     return [th,th0,file]
@@ -66,7 +66,7 @@ D = [vectorize(email),{1,0,-1},
 #=====Final_Check=====
 
 def is_spam(data, vectorized=False):
-    df = pd.read_csv(r"C:\Users\rosha\OneDrive\Desktop\Programs_\EMail_Spam_Classifier\thetas.csv")
+    df = pd.read_csv("thetas.csv")
     TH,TH0 = list(df["th"]),list(df["th0"])
     th,th0 = np.array((str(TH[-1])[1:len(TH[-1])-1]).split(",")).astype(float),TH0[-1]
     if vectorized == False:
@@ -103,7 +103,7 @@ def calculate_confusion_matrix(performance, actual):
 def clean_dataset():
     New_Dataset = []
     Confirmations = []
-    df = pd.read_csv(r"C:\Users\rosha\OneDrive\Desktop\Programs_\EMail_Spam_Classifier\Testing_Dataset.csv")
+    df = pd.read_csv("Testing_Dataset.csv")
     Label = np.array(df["Label"]).astype(int)
     Vectors = np.array(df["Vectorized_Mail"])
     for i in range(len(Label)):
@@ -137,12 +137,14 @@ On1 = {'accuracy': 94.081, 'precision': 68.0, 'recall': 91.892, 'F1 Score': 78.1
 
 def check_diff_T(T=40):
     New_Dataset = []
-    df = pd.read_csv(r"C:\Users\rosha\OneDrive\Desktop\Programs_\EMail_Spam_Classifier\Training_Dataset.csv")
+    df = pd.read_csv("Training_Dataset.csv")
     Label = np.array(df["Label"]).astype(int)
     Vectors = np.array(df["Vectorized_Mail"])
     for i in range(len(Label)):
         New_Dataset.append([(np.array(re.findall(r'[0-9]+',(Vectors[i]))).astype(int)) , int(Label[i])])
     THS = perceptron(New_Dataset,T)
+    with open("thetas.csv","a") as f:
+        f.write(f"{T},")
     save_thetas(THS[0],THS[1])
     CD = clean_dataset()
     Prediction, Actually= CD[0], (CD[1])[5:-1]
